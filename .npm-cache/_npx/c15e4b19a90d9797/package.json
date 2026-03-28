@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "expo-doctor": "^1.18.15-canary-20260327-0789fbc"
+  },
+  "_npx": {
+    "packages": [
+      "expo-doctor"
+    ]
+  }
+}
