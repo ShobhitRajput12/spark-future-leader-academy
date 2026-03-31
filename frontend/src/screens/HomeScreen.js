@@ -56,7 +56,7 @@ export default function HomeScreen({ navigation }) {
               style={{ width: cardWidth }}
               accent={colors.accentBlue}
               icon="chatbubble-ellipses-outline"
-              title="AI Career Guide"
+              title="Career Guide"
               subtitle="Ask Anything"
               badge="Ready"
               onPress={() => navigation.getParent()?.navigate('AI Chat')}
