@@ -18,18 +18,20 @@ import { colors } from '../theme/colors';
 
 const SUGGESTIONS = ['How to join NDA?', 'Eligibility for CDS?', 'Best defence career for me?'];
 
-export default function AiChatScreen() {
+export default function AiChatScreen({ route }) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState(() => [
     {
       id: 'm0',
       role: 'ai',
-      text: "Hi! I'm your AI Career Guide. Ask me anything about NDA, CDS, AFCAT, Agniveer, preparation, fitness, and more.",
+      text: "Hi! Welcome to Spark Future Leaders Academy (Obul Reddy School). Ask me anything about NDA, CDS, AFCAT, Agniveer, preparation, fitness, and more.",
     },
   ]);
 
   const abortRef = useRef(null);
+  const prefilledRef = useRef(null);
+  const autoSentRef = useRef(null);
   const baseUrl = useMemo(() => getApiBaseUrl(), []);
   const isDefaultLocalhost = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
   const showApiHints = false;
@@ -64,6 +66,23 @@ export default function AiChatScreen() {
     [isTyping]
   );
 
+  useEffect(() => {
+    const initialPrompt = route?.params?.initialPrompt;
+    if (!initialPrompt) return;
+    if (prefilledRef.current === initialPrompt) return;
+    prefilledRef.current = initialPrompt;
+    setInput((current) => (String(current || '').trim().length ? current : initialPrompt));
+  }, [route?.params?.initialPrompt]);
+
+  useEffect(() => {
+    const initialPrompt = route?.params?.initialPrompt;
+    const autoSend = route?.params?.autoSend === true;
+    if (!autoSend || !initialPrompt) return;
+    if (autoSentRef.current === initialPrompt) return;
+    autoSentRef.current = initialPrompt;
+    send(initialPrompt);
+  }, [route?.params?.autoSend, route?.params?.initialPrompt, send]);
+
   useEffect(() => () => abortRef.current?.abort?.(), []);
 
   return (
@@ -74,10 +93,10 @@ export default function AiChatScreen() {
             <Ionicons name="sparkles" size={18} color={colors.accentBlue} />
           </View>
           <View>
-            <Text style={styles.headerTitle}>AI Career Guide</Text>
+            <Text style={styles.headerTitle}>Spark Future Leaders Academy</Text>
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
-              <Text style={styles.statusText}>Ready</Text>
+              <Text style={styles.statusText}>Obul Reddy School</Text>
             </View>
           </View>
         </View>

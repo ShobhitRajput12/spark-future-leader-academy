@@ -1,6 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AiChatScreen from '../screens/AiChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -11,6 +13,10 @@ import HomeStack from './HomeStack';
 const Tab = createBottomTabNavigator();
 
 export default function MainTabs() {
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const isSmallDevice = width < 360;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -20,13 +26,22 @@ export default function MainTabs() {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
-          height: 64,
-          paddingBottom: 10,
-          paddingTop: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 8),
+          paddingTop: 6,
         },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
-        tabBarIcon: ({ color, size, focused }) => {
-          const iconSize = focused ? size + 2 : size;
+        tabBarLabelStyle: {
+          fontSize: isSmallDevice ? 10 : 11,
+          fontWeight: '600',
+          marginBottom: 4,
+          paddingBottom: 2,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
+        },
+        tabBarIcon: ({ color, focused }) => {
+          const baseIconSize = isSmallDevice ? 20 : 22;
+          const iconSize = focused ? baseIconSize + 2 : baseIconSize;
           const iconName = (() => {
             switch (route.name) {
               case 'Home':
@@ -52,4 +67,3 @@ export default function MainTabs() {
     </Tab.Navigator>
   );
 }
-
