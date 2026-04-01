@@ -25,7 +25,7 @@ export default function AiChatScreen({ route }) {
     {
       id: 'm0',
       role: 'ai',
-      text: "Hi! Welcome to P Obul Reddy Public School (Spark Future Leaders Academy). Ask me anything about NDA, CDS, AFCAT, Agniveer, preparation, fitness, and more.",
+      text: "Hi! Welcome to P Obul Reddy Public School & Spark Future Leaders Academy . Ask me anything about NDA, CDS, AFCAT, Agniveer, preparation, fitness, and more.",
     },
   ]);
 
@@ -93,11 +93,8 @@ export default function AiChatScreen({ route }) {
             <Ionicons name="sparkles" size={18} color={colors.accentBlue} />
           </View>
           <View>
-            <Text style={styles.headerTitle}>P Obul Reddy Public School</Text>
-            <View style={styles.statusRow}>
-              <View style={styles.statusDot} />
-              <Text style={styles.statusText}>Spark Future Leaders Academy</Text>
-            </View>
+            <Text style={styles.headerTitle}>P Obul Reddy Public School & Spark Future Leaders Academy</Text>
+            
           </View>
         </View>
         {showApiHints ? (
