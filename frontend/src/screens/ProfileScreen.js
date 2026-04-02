@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import GlowCard from '../components/GlowCard';
 import Screen from '../components/Screen';
@@ -10,7 +11,13 @@ export default function ProfileScreen() {
   return (
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <View style={styles.header}>
+        <LinearGradient
+          colors={[colors.glass2, 'rgba(255,255,255,0.012)', 'transparent']}
+          locations={[0, 0.6, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
           <View style={styles.avatar}>
             <Ionicons name="person" size={22} color={colors.text} />
           </View>
@@ -18,7 +25,7 @@ export default function ProfileScreen() {
             <Text style={styles.name}>Cadet</Text>
             <Text style={styles.desc}>Build your plan • Track your progress</Text>
           </View>
-        </View>
+        </LinearGradient>
 
         <View style={styles.list}>
           <GlowCard
@@ -58,14 +65,30 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   scroll: { paddingBottom: 24 },
-  header: { paddingTop: 8, paddingBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  header: {
+    marginTop: 10,
+    marginBottom: 10,
+    padding: 16,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.glass2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.30,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 12,
+  },
   avatar: {
     height: 46,
     width: 46,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.glass,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -75,4 +98,3 @@ const styles = StyleSheet.create({
   settingRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   settingText: { color: colors.muted, fontWeight: '700', fontSize: 12.5 },
 });
-

@@ -1,4 +1,4 @@
-﻿import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Linking from 'expo-linking';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -12,6 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Screen from '../components/Screen';
 import TypingDots from '../components/TypingDots';
@@ -22,6 +23,7 @@ import { getApiBaseUrl } from '../services/ai';
 // Example-only screen (not wired into navigation by default).
 // Requires: expo-document-picker (and Expo runtime).
 export default function RagChatExampleScreen() {
+  const insets = useSafeAreaInsets();
   const [sector, setSector] = useState('');
   const [uploadStatus, setUploadStatus] = useState('No PDF uploaded yet');
 
@@ -145,7 +147,7 @@ export default function RagChatExampleScreen() {
       />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.composer}>
+        <View style={[styles.composer, { paddingBottom: 14 + (insets?.bottom || 0) }]}>
           <View style={styles.inputWrap}>
             <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.faint} />
             <TextInput
@@ -245,6 +247,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.glassBorder,
+    backgroundColor: colors.glass2,
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   aiIcon: {
@@ -254,8 +259,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(64,201,255,0.24)',
-    backgroundColor: 'rgba(64,201,255,0.10)',
+    borderColor: 'rgba(79,211,255,0.26)',
+    backgroundColor: 'rgba(79,211,255,0.10)',
   },
   headerTitle: { color: colors.text, fontWeight: '900', fontSize: 16 },
   headerSub: { color: colors.muted, fontWeight: '700', fontSize: 12, marginTop: 3 },
@@ -272,8 +277,8 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.glass2,
     paddingHorizontal: 12,
     color: colors.text,
     fontWeight: '700',
@@ -287,13 +292,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     backgroundColor: colors.accentBlue,
+    shadowColor: colors.accentBlue,
+    shadowOpacity: 0.22,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
   },
   uploadBtnText: { color: colors.text, fontWeight: '900' },
 
   list: { paddingHorizontal: 18, paddingBottom: 10 },
   bubble: { maxWidth: '92%', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 16, marginVertical: 6, borderWidth: 1 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(45,255,149,0.10)', borderColor: 'rgba(45,255,149,0.22)' },
-  aiBubble: { alignSelf: 'flex-start', backgroundColor: colors.card2, borderColor: colors.border },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(43,255,155,0.10)', borderColor: 'rgba(43,255,155,0.22)' },
+  aiBubble: { alignSelf: 'flex-start', backgroundColor: colors.glass2, borderColor: colors.glassBorder },
   bubbleText: { fontSize: 13.5, lineHeight: 18 },
   userText: { color: colors.text, fontWeight: '700' },
   aiText: { color: colors.text, fontWeight: '600' },
@@ -311,15 +321,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: colors.glass,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.glassBorder,
   },
   openBtnDisabled: { opacity: 0.5 },
   openBtnText: { color: colors.text, fontWeight: '900', fontSize: 12 },
 
   composer: { paddingHorizontal: 18, paddingBottom: 14, flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
-  inputWrap: { flex: 1, minHeight: 48, borderRadius: 16, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, paddingHorizontal: 12, paddingVertical: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
+  inputWrap: { flex: 1, minHeight: 48, borderRadius: 16, borderWidth: 1, borderColor: colors.glassBorder, backgroundColor: colors.glass2, paddingHorizontal: 12, paddingVertical: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
   input: { flex: 1, color: colors.text, fontSize: 14, fontWeight: '600', padding: 0, margin: 0, maxHeight: 120 },
   sendBtn: { height: 48, width: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentBlue },
   sendBtnDisabled: { backgroundColor: 'rgba(64,201,255,0.25)' },

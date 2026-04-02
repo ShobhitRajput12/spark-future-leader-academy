@@ -1,18 +1,24 @@
 import { DarkTheme } from '@react-navigation/native';
 
 export const colors = {
-  bg: '#06060A',
-  card: '#0B0B12',
-  card2: '#0F0F1A',
-  border: 'rgba(255,255,255,0.08)',
-  text: '#F5F7FF',
-  muted: 'rgba(245,247,255,0.65)',
-  faint: 'rgba(245,247,255,0.4)',
-  accentOrange: '#FF7A00',
-  accentGreen: '#2DFF95',
-  accentBlue: '#40C9FF',
-  accentPurple: '#A78BFA',
+  bg: '#05060A',
+  card: '#0B0E16',
+  card2: '#0D101B',
+  border: 'rgba(255,255,255,0.10)',
+  text: '#F4F7FF',
+  muted: 'rgba(244,247,255,0.70)',
+  faint: 'rgba(244,247,255,0.44)',
+  accentOrange: '#FF8A1F',
+  accentGreen: '#2BFF9B',
+  accentBlue: '#4FD3FF',
+  accentPurple: '#B39BFF',
   danger: '#FF3B30',
+
+  // Premium “glass” surfaces
+  glass: 'rgba(255,255,255,0.035)',
+  glass2: 'rgba(255,255,255,0.025)',
+  glassBorder: 'rgba(255,255,255,0.12)',
+  glowBlue: 'rgba(79,211,255,0.18)',
 };
 
 export const navTheme = {
@@ -27,4 +33,3 @@ export const navTheme = {
     notification: colors.accentOrange,
   },
 };
-

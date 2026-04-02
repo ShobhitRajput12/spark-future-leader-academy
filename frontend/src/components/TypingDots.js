@@ -29,11 +29,15 @@ export default function TypingDots({ color = colors.muted }) {
 function Dot({ anim, color }) {
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [0, -3] });
   const opacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0.45, 1] });
-  return <Animated.View style={[styles.dot, { backgroundColor: color, opacity, transform: [{ translateY }] }]} />;
+  const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1.08] });
+  return (
+    <Animated.View
+      style={[styles.dot, { backgroundColor: color, opacity, transform: [{ translateY }, { scale }] }]}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', height: 14, gap: 6 },
   dot: { width: 6, height: 6, borderRadius: 999 },
 });
-

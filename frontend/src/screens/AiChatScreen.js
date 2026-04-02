@@ -1,4 +1,4 @@
-﻿import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Screen from '../components/Screen';
 import TypingDots from '../components/TypingDots';
@@ -19,6 +20,7 @@ import { colors } from '../theme/colors';
 const SUGGESTIONS = ['How to join NDA?', 'Eligibility for CDS?', 'Best defence career for me?'];
 
 export default function AiChatScreen({ route, navigation }) {
+  const insets = useSafeAreaInsets();
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState(() => [
@@ -141,7 +143,7 @@ export default function AiChatScreen({ route, navigation }) {
           ))}
         </View>
 
-        <View style={styles.composer}>
+        <View style={[styles.composer, { paddingBottom: 14 + (insets?.bottom || 0) }]}>
           <View style={styles.inputWrap}>
             <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.faint} />
             <TextInput
@@ -224,8 +226,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.bg,
+    borderBottomColor: colors.glassBorder,
+    backgroundColor: colors.glass2,
   },
   headerMain: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
   backBtn: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
@@ -237,8 +239,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(64,201,255,0.24)',
-    backgroundColor: 'rgba(64,201,255,0.10)',
+    borderColor: 'rgba(79,211,255,0.26)',
+    backgroundColor: 'rgba(79,211,255,0.10)',
   },
   headerTitle: { color: colors.text, fontWeight: '900', fontSize: 16 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
@@ -273,16 +275,16 @@ const styles = StyleSheet.create({
   bannerText: { color: colors.muted, fontWeight: '600', fontSize: 12.5, lineHeight: 17, flex: 1 },
   list: { paddingHorizontal: 18, paddingBottom: 10 },
   bubble: { maxWidth: '86%', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 16, marginVertical: 6, borderWidth: 1 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(45,255,149,0.10)', borderColor: 'rgba(45,255,149,0.22)' },
-  aiBubble: { alignSelf: 'flex-start', backgroundColor: colors.card2, borderColor: colors.border },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: 'rgba(43,255,155,0.10)', borderColor: 'rgba(43,255,155,0.22)' },
+  aiBubble: { alignSelf: 'flex-start', backgroundColor: colors.glass2, borderColor: colors.glassBorder },
   bubbleText: { fontSize: 13.5, lineHeight: 18 },
   userText: { color: colors.text, fontWeight: '700' },
   aiText: { color: colors.text, fontWeight: '600' },
   suggestions: { flexDirection: 'row', gap: 8, paddingHorizontal: 18, paddingBottom: 10 },
-  suggestionChip: { flex: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.03)' },
+  suggestionChip: { flex: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.glass },
   suggestionText: { color: colors.muted, fontWeight: '700', fontSize: 12 },
   composer: { paddingHorizontal: 18, paddingBottom: 14, flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
-  inputWrap: { flex: 1, minHeight: 48, borderRadius: 16, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, paddingHorizontal: 12, paddingVertical: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
+  inputWrap: { flex: 1, minHeight: 48, borderRadius: 16, borderWidth: 1, borderColor: colors.glassBorder, backgroundColor: colors.glass2, paddingHorizontal: 12, paddingVertical: 10, flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
   input: { flex: 1, color: colors.text, fontSize: 14, fontWeight: '600', padding: 0, margin: 0, maxHeight: 120 },
   sendBtn: { height: 48, width: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentBlue, shadowColor: colors.accentBlue, shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: { width: 0, height: 10 }, elevation: 10 },
   sendBtnDisabled: { backgroundColor: 'rgba(64,201,255,0.25)', shadowOpacity: 0, elevation: 0 },
