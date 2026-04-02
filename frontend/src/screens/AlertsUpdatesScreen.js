@@ -30,7 +30,6 @@ export default function AlertsUpdatesScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <View style={styles.top}>
-          <Text style={styles.title}>Alerts & Updates</Text>
           <Text style={styles.subtitle}>New Updates</Text>
         </View>
 

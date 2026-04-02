@@ -63,11 +63,23 @@ export default function SchemesScreen({ navigation }) {
   const routeNotFound = String(error || '').toLowerCase().includes('route not found');
   const showGuided = routeNotFound;
 
+  const onBack = () => {
+    if (navigation?.canGoBack?.()) return navigation.goBack();
+    return navigation?.navigate?.('Home');
+  };
+
   return (
-    <Screen>
+    <Screen padded={false}>
+      <View style={styles.navHeader}>
+        <Pressable onPress={onBack} hitSlop={10} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={20} color={colors.text} />
+        </Pressable>
+        <Text numberOfLines={1} style={styles.navTitle}>
+          Entry Schemes
+        </Text>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <View style={styles.top}>
-          <Text style={styles.title}>Entry Schemes</Text>
           <Text style={styles.subtitle}>How to Join</Text>
         </View>
 
@@ -132,7 +144,20 @@ export default function SchemesScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  scroll: { paddingBottom: 24 },
+  scroll: { paddingHorizontal: 18, paddingTop: 8, paddingBottom: 24 },
+  navHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.bg,
+  },
+  backBtn: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
+  navTitle: { color: colors.text, fontSize: 22, fontWeight: '900', flexShrink: 1 },
   top: { paddingTop: 8, paddingBottom: 14 },
   title: { color: colors.text, fontSize: 22, fontWeight: '900' },
   subtitle: { marginTop: 6, color: colors.muted, fontSize: 13.5, fontWeight: '700' },

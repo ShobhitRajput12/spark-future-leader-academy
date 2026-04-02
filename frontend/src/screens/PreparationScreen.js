@@ -18,7 +18,6 @@ export default function PreparationScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <View style={styles.top}>
-          <Text style={styles.title}>Preparation</Text>
           <Text style={styles.subtitle}>Get Ready</Text>
         </View>
 

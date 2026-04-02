@@ -18,7 +18,7 @@ import { colors } from '../theme/colors';
 
 const SUGGESTIONS = ['How to join NDA?', 'Eligibility for CDS?', 'Best defence career for me?'];
 
-export default function AiChatScreen({ route }) {
+export default function AiChatScreen({ route, navigation }) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState(() => [
@@ -88,13 +88,17 @@ export default function AiChatScreen({ route }) {
   return (
     <Screen padded={false}>
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={styles.aiIcon}>
-            <Ionicons name="sparkles" size={18} color={colors.accentBlue} />
-          </View>
-          <View>
-            <Text style={styles.headerTitle}>P Obul Reddy Public School & Spark Future Leaders Academy</Text>
-            
+        <View style={styles.headerMain}>
+          <Pressable onPress={() => navigation?.goBack?.()} hitSlop={10} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={20} color={colors.text} />
+          </Pressable>
+          <View style={styles.headerLeft}>
+            <View style={styles.aiIcon}>
+              <Ionicons name="sparkles" size={18} color={colors.accentBlue} />
+            </View>
+            <View>
+              <Text style={styles.headerTitle}>P Obul Reddy Public School & Spark Future Leaders Academy</Text>
+            </View>
           </View>
         </View>
         {showApiHints ? (
@@ -219,7 +223,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.bg,
   },
+  headerMain: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  backBtn: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   aiIcon: {
     height: 38,
@@ -278,4 +287,3 @@ const styles = StyleSheet.create({
   sendBtn: { height: 48, width: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentBlue, shadowColor: colors.accentBlue, shadowOpacity: 0.28, shadowRadius: 12, shadowOffset: { width: 0, height: 10 }, elevation: 10 },
   sendBtnDisabled: { backgroundColor: 'rgba(64,201,255,0.25)', shadowOpacity: 0, elevation: 0 },
 });
-

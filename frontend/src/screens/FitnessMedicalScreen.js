@@ -18,7 +18,6 @@ export default function FitnessMedicalScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <View style={styles.top}>
-          <Text style={styles.title}>Fitness & Medical</Text>
           <Text style={styles.subtitle}>Stay Fit</Text>
         </View>
 

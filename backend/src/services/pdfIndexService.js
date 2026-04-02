@@ -1,6 +1,7 @@
 ﻿const fs = require('fs');
 const fsPromises = require('fs/promises');
 const path = require('path');
+const crypto = require('crypto');
 
 const DefenseDocument = require('../models/DefenseDocument');
 const { embedText, ensureVectorSearchIndex } = require('./vectorService');
@@ -31,6 +32,18 @@ function resolveUploadsRootDir(rootDirOverride) {
 function isPdfFile(filePath) {
   const ext = path.extname(String(filePath || '')).toLowerCase();
   return ext === '.pdf';
+}
+
+function computeFileSha256(absFilePath) {
+  const p = path.resolve(String(absFilePath));
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(p);
+
+    stream.on('data', (d) => hash.update(d));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(hash.digest('hex')));
+  });
 }
 
 function getRootDir() {
@@ -68,8 +81,10 @@ function computeChunkKey({ rootDir, filePath }) {
   return { pdfName, sector };
 }
 
-async function doIndexPdfFile(filePath, { rootDir, uploadedAt } = {}) {
+async function doIndexPdfFile(filePath, { rootDir, uploadedAt, source, fileHash } = {}) {
   await ensureVectorSearchIndex();
+
+  const src = source || path.resolve(String(filePath));
 
   const absRoot = resolveUploadsRootDir(rootDir);
   const { pdfName, sector } = computeChunkKey({ rootDir: absRoot, filePath });
@@ -99,6 +114,8 @@ async function doIndexPdfFile(filePath, { rootDir, uploadedAt } = {}) {
         sector,
         page: c.page,
         uploadedAt: when,
+        source: src,
+        fileHash,
       });
 
       chunkCount += 1;
@@ -142,7 +159,7 @@ async function doIndexPdfFile(filePath, { rootDir, uploadedAt } = {}) {
   }
 }
 
-async function indexPdfFile(absFilePath, { rootDir, uploadedAt, force } = {}) {
+async function indexPdfFile(absFilePath, { rootDir, uploadedAt, force, fileHash } = {}) {
   const filePath = path.resolve(String(absFilePath));
   if (!isPdfFile(filePath)) return { ok: false, skipped: true, reason: 'not_pdf' };
 
@@ -158,17 +175,22 @@ async function indexPdfFile(absFilePath, { rootDir, uploadedAt, force } = {}) {
     }
   }
 
-  if (!force) {
-    const already = await DefenseDocument.exists({ pdfName, sector });
-    if (already) return { ok: true, skipped: true, reason: 'already_indexed', filePath };
-  } else {
-    // Ensure a clean rebuild for this PDF.
-    await DefenseDocument.deleteMany({ pdfName, sector });
-  }
+  const currentHash = fileHash || (await computeFileSha256(filePath));
 
+  if (!force) {
+    const already = await DefenseDocument.findOne({ source: filePath, fileHash: currentHash }).select({ _id: 1 });
+    if (already) return { ok: true, skipped: true, reason: 'already_indexed', filePath };
+  }
   if (inProgress.has(filePath)) return { ok: true, skipped: true, reason: 'indexing_in_progress', filePath };
 
-  const promise = doIndexPdfFile(filePath, { rootDir: absRoot, uploadedAt });
+  const promise = (async () => {
+    // Ensure a clean rebuild for this PDF (source-based, with legacy fallback).
+    await DefenseDocument.deleteMany({
+      $or: [{ source: filePath }, { pdfName, sector, source: { $exists: false } }],
+    });
+
+    return doIndexPdfFile(filePath, { rootDir: absRoot, uploadedAt, source: filePath, fileHash: currentHash });
+  })();
   inProgress.set(filePath, promise);
 
   try {
@@ -182,11 +204,6 @@ async function indexPdfIfNeeded(absFilePath, { rootDir } = {}) {
   const filePath = path.resolve(String(absFilePath));
 
   const absRoot = resolveUploadsRootDir(rootDir);
-  const { pdfName, sector } = computeChunkKey({ rootDir: absRoot, filePath });
-
-  const exists = await DefenseDocument.exists({ pdfName, sector });
-  if (exists) return { ok: true, skipped: true, reason: 'already_indexed', filePath };
-
   return indexPdfFile(filePath, { rootDir: absRoot });
 }
 
@@ -227,4 +244,14 @@ module.exports = {
   computeFolderMeta,
   ensureRootDir,
 };
+
+
+
+
+
+
+
+
+
+
 

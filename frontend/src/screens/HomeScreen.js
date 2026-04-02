@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import DashboardCard from '../components/DashboardCard';
 import Screen from '../components/Screen';
@@ -33,10 +33,10 @@ export default function HomeScreen({ navigation }) {
         <Animated.View style={{ opacity: fade, transform: [{ translateY: lift }] }}>
           <View style={styles.top}>
             <View style={styles.pulseWrap}>
-              <View style={styles.pulse}>
-                <Ionicons name="shield-checkmark" size={16} color={colors.accentGreen} />
-                <Text style={styles.pulseText}>Premium Dashboard</Text>
-              </View>
+              <Pressable onPress={() => navigation.getParent()?.navigate('Profile')} style={styles.pulse}>
+                <Ionicons name="person-circle" size={16} color={colors.accentGreen} />
+                <Text style={styles.pulseText}>Profile</Text>
+              </Pressable>
             </View>
 
             <Text style={styles.title}>Spark Future Leader Academy</Text>
@@ -123,3 +123,5 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   footerSpace: { height: 18 },
 });
+
+

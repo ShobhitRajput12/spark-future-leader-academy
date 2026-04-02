@@ -34,7 +34,7 @@ async function startStartupScanner({ rootDir } = {}) {
       const { category } = computeFolderMeta({ rootDir: absRoot, filePath: absFile });
       const sector = category;
 
-      const r = await indexPdfFile(absFile, { rootDir: absRoot, force: true });
+      const r = await indexPdfFile(absFile, { rootDir: absRoot });
       if (r && r.indexed) indexed += 1;
       else skipped += 1;
     } catch (e) {
@@ -54,3 +54,4 @@ async function startStartupScanner({ rootDir } = {}) {
 module.exports = {
   startStartupScanner,
 };
+
