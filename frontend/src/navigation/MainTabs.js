@@ -23,13 +23,7 @@ export default function MainTabs() {
         headerShown: false,
         tabBarActiveTintColor: colors.accentBlue,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: {
-          backgroundColor: colors.card,
-          borderTopColor: colors.border,
-          height: 60 + insets.bottom,
-          paddingBottom: Math.max(insets.bottom, 8),
-          paddingTop: 6,
-        },
+        tabBarStyle: { display: 'none' },
         tabBarLabelStyle: {
           fontSize: isSmallDevice ? 10 : 11,
           fontWeight: '600',
