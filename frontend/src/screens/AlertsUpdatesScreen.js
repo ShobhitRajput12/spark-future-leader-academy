@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   title: { color: colors.text, fontSize: 22, fontWeight: '900' },
-  subtitle: { color: colors.text, fontSize: 22, fontWeight: '900', letterSpacing: 0.25 },
+  subtitle: { color: colors.text, fontSize: 22, fontWeight: '900', letterSpacing: 0.25, includeFontPadding: false },
   list: { gap: 12 },
   pressed: { opacity: 0.92 },
 });

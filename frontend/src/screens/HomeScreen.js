@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,26 +11,92 @@ import { colors } from '../theme/colors';
 export default function HomeScreen({ navigation }) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const cols = 2;
-  const gap = 12;
-  const cardWidth = useMemo(() => {
-    const horizontalPadding = 18 * 2;
-    const totalGap = gap * (cols - 1);
-    return Math.floor((width - horizontalPadding - totalGap) / cols);
-  }, [width]);
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
-  const heroMinHeight = useMemo(() => {
-    const v = Math.round(height * 0.218);
-    return Math.min(198, Math.max(170, v));
-  }, [height]);
-  const heroPadding = useMemo(() => {
-    const v = Math.round(height * 0.021);
-    return Math.min(18, Math.max(16, v));
-  }, [height]);
-  const heroGlowHeight = useMemo(() => {
-    const v = Math.round(heroMinHeight * 1.06);
-    return Math.min(214, Math.max(182, v));
-  }, [heroMinHeight]);
+  const badgeRefW = useRef(0);
+  const [badgeW, setBadgeW] = useState(0);
+
+  const wScale = useMemo(() => clamp(width / 390, 0.85, 1.2), [width]);
+  const hScale = useMemo(() => clamp(height / 844, 0.78, 1.12), [height]);
+  const uiScale = useMemo(() => Math.min(wScale, hScale), [hScale, wScale]);
+
+  const outerPadding = useMemo(() => {
+    const v = Math.round(width * 0.046);
+    return clamp(v, 12, 22);
+  }, [width]);
+  const cols = 2;
+  const colGap = useMemo(() => clamp(Math.round(12 * uiScale), 8, 16), [uiScale]);
+  const rowGapBase = useMemo(() => clamp(Math.round(14 * uiScale), 6, 16), [uiScale]);
+
+  const cardWidth = useMemo(() => {
+    const horizontalPadding = outerPadding * 2;
+    const totalGap = colGap * (cols - 1);
+    return Math.floor((width - horizontalPadding - totalGap) / cols);
+  }, [colGap, cols, outerPadding, width]);
+
+  const topPad = useMemo(() => clamp(Math.round(10 * uiScale), 6, 14), [uiScale]);
+  const bottomPad = useMemo(
+    () => clamp(Math.round(8 * uiScale), 4, 12) + (insets?.bottom || 0),
+    [insets?.bottom, uiScale]
+  );
+  const heroToGridGap = useMemo(() => clamp(Math.round(10 * uiScale), 4, 14), [uiScale]);
+
+  const availableHeight = useMemo(() => {
+    const safeTop = insets?.top || 0;
+    return Math.max(0, Math.floor(height - safeTop - topPad - bottomPad));
+  }, [bottomPad, height, insets?.top, topPad]);
+
+  const layout = useMemo(() => {
+    const minHeroTarget = clamp(Math.round(116 * uiScale), 96, 160);
+    const maxHero = clamp(Math.round(230 * uiScale), 170, 280);
+    const minRowTarget = clamp(Math.round(96 * uiScale), 78, 140);
+    const maxRow = clamp(Math.round(210 * uiScale), 150, 260);
+
+    let heroRatio = 0.27;
+    let rowGap = rowGapBase;
+
+    let heroH = clamp(Math.floor(availableHeight * heroRatio), 0, maxHero);
+    let rowH = Math.floor((availableHeight - heroH - heroToGridGap - 2 * rowGap) / 3);
+
+    for (let i = 0; i < 12 && rowH < minRowTarget && heroH > minHeroTarget; i += 1) {
+      heroRatio = Math.max(0.18, heroRatio - 0.02);
+      rowGap = Math.max(4, rowGap - 1);
+      heroH = clamp(Math.floor(availableHeight * heroRatio), 0, maxHero);
+      rowH = Math.floor((availableHeight - heroH - heroToGridGap - 2 * rowGap) / 3);
+    }
+
+    rowH = clamp(rowH, 0, maxRow);
+    const gridH = Math.max(0, availableHeight - heroH - heroToGridGap);
+    return { heroH, gridH, rowH, rowGap };
+  }, [availableHeight, heroToGridGap, rowGapBase, uiScale]);
+
+  const heroPadH = useMemo(() => clamp(outerPadding + Math.round(8 * uiScale), outerPadding, outerPadding + 16), [outerPadding, uiScale]);
+  const heroPaddingV = useMemo(() => clamp(Math.round(layout.heroH * 0.12), 6, 22), [layout.heroH]);
+
+  const heroRadius = useMemo(() => clamp(Math.round(28 * uiScale), 22, 38), [uiScale]);
+  const heroGlowRadius = useMemo(() => clamp(heroRadius + 4, 24, 44), [heroRadius]);
+  const heroGlowHeight = useMemo(() => clamp(Math.round(layout.heroH * 1.08), 150, 360), [layout.heroH]);
+
+  const pulseFontSize = useMemo(() => clamp(Math.round(12 * uiScale), 10, 14), [uiScale]);
+  const pulsePadH = useMemo(() => clamp(Math.round(10 * uiScale), 7, 12), [uiScale]);
+  const pulsePadV = useMemo(() => clamp(Math.round(6 * uiScale), 4, 8), [uiScale]);
+  const badgeTop = useMemo(() => clamp(Math.round(12 * uiScale), 8, 16), [uiScale]);
+  const badgeRight = useMemo(() => clamp(Math.round(12 * uiScale), 8, 16), [uiScale]);
+  const badgeReserve = useMemo(() => clamp(badgeW + badgeRight + 8, 86, 150), [badgeRight, badgeW]);
+
+  const titleFontSize = useMemo(() => {
+    const heroTextScale = clamp(layout.heroH / 210, 0.70, 1.08);
+    const base = 27 * Math.min(uiScale, heroTextScale);
+    const widthAdj = width <= 360 ? -3 : width <= 400 ? -1 : 0;
+    const badgeAdj = badgeW >= 96 ? -2 : 0;
+    const approxTextW = width - outerPadding * 2 - heroPadH * 2 - badgeReserve;
+    const wAdj2 = approxTextW < 230 ? -2 : approxTextW < 255 ? -1 : 0;
+    return clamp(Math.round(base + widthAdj + badgeAdj + wAdj2), 15, 30);
+  }, [badgeReserve, badgeW, heroPadH, layout.heroH, outerPadding, uiScale, width]);
+  const titleLineHeight = useMemo(() => clamp(Math.round(titleFontSize * 1.16), 20, 34), [titleFontSize]);
+  const titleToSubtitle = useMemo(() => clamp(Math.round(8 * uiScale), 5, 12), [uiScale]);
+  const subtitleFontSize = useMemo(() => clamp(Math.round(13 * uiScale), 11, 15), [uiScale]);
+  const subtitleLineHeight = useMemo(() => clamp(Math.round(18 * uiScale), 14, 20), [uiScale]);
 
   const heroFade = useRef(new Animated.Value(0)).current;
   const heroLift = useRef(new Animated.Value(10)).current;
@@ -49,12 +115,19 @@ export default function HomeScreen({ navigation }) {
       cardEnter.map((v) => Animated.timing(v, { toValue: 1, duration: 360, useNativeDriver: true }))
     );
 
-    const bgLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(bg, { toValue: 1, duration: 6200, useNativeDriver: true }),
-        Animated.timing(bg, { toValue: 0, duration: 6200, useNativeDriver: true }),
-      ])
-    );
+    let cancelled = false;
+    let bgAnim = null;
+    const runBgSweep = () => {
+      if (cancelled) return;
+      bg.setValue(0);
+      bgAnim = Animated.sequence([
+        Animated.timing(bg, { toValue: 1, duration: 1300, useNativeDriver: true }),
+        Animated.delay(5000),
+      ]);
+      bgAnim.start(({ finished }) => {
+        if (finished && !cancelled) runBgSweep();
+      });
+    };
 
     const pulseLoop = Animated.loop(
       Animated.sequence([
@@ -63,17 +136,21 @@ export default function HomeScreen({ navigation }) {
       ])
     );
 
-    bgLoop.start();
+    runBgSweep();
     pulseLoop.start();
     Animated.sequence([heroAnim, Animated.delay(60), cardsAnim]).start();
 
     return () => {
-      bgLoop.stop();
+      cancelled = true;
+      bgAnim?.stop?.();
       pulseLoop.stop();
     };
   }, [bg, cardEnter, heroFade, heroLift, pulse]);
 
-  const glowX = bg.interpolate({ inputRange: [0, 1], outputRange: [-Math.max(120, width * 0.25), Math.max(120, width * 0.25)] });
+  const glowX = bg.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-Math.max(120, width * 0.25), Math.max(120, width * 0.25)],
+  });
   const glowOpacity = bg.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.22, 0.42, 0.22] });
   const pulseOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.18, 0.35] });
   const pulseScale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] });
@@ -83,17 +160,14 @@ export default function HomeScreen({ navigation }) {
   });
 
   return (
-    <Screen>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scroll, { paddingBottom: insets?.bottom || 0 }]}
-      >
-        <View style={styles.top}>
+    <Screen padded={false}>
+      <View style={[styles.container, { paddingHorizontal: outerPadding, paddingTop: topPad, paddingBottom: bottomPad }]}>
+        <View style={[styles.heroWrap, { height: layout.heroH }]}>
           <Animated.View
             pointerEvents="none"
             style={[
               styles.heroBgGlow,
-              { height: heroGlowHeight, opacity: glowOpacity, transform: [{ translateX: glowX }] },
+              { height: heroGlowHeight, opacity: glowOpacity, transform: [{ translateX: glowX }], borderRadius: heroGlowRadius },
             ]}
           >
             <LinearGradient
@@ -110,31 +184,62 @@ export default function HomeScreen({ navigation }) {
               locations={[0, 0.55, 1]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[styles.hero, { minHeight: heroMinHeight, padding: heroPadding }]}
+              style={[
+                styles.hero,
+                {
+                  height: layout.heroH,
+                  paddingHorizontal: heroPadH,
+                  paddingVertical: heroPaddingV,
+                  borderRadius: heroRadius,
+                },
+              ]}
             >
               <Pressable
                 onPress={() => navigation.getParent()?.navigate('Profile')}
-                style={[styles.pulse, styles.pulseInHero]}
+                onLayout={(e) => {
+                  const w = Math.round(e?.nativeEvent?.layout?.width || 0);
+                  if (!w || w === badgeRefW.current) return;
+                  badgeRefW.current = w;
+                  setBadgeW(w);
+                }}
+                style={[
+                  styles.pulse,
+                  { paddingHorizontal: pulsePadH, paddingVertical: pulsePadV, top: badgeTop, right: badgeRight },
+                ]}
               >
-                <Animated.View
-                  pointerEvents="none"
-                  style={[styles.pulseGlow, { opacity: pulseOpacity, transform: [{ scale: pulseScale }] }]}
-                />
+                <Animated.View pointerEvents="none" style={[styles.pulseGlow, { opacity: pulseOpacity, transform: [{ scale: pulseScale }] }]} />
                 <Ionicons name="person-circle" size={16} color={colors.accentGreen} />
-                <Text style={styles.pulseText}>Profile</Text>
+                <Text style={[styles.pulseText, { fontSize: pulseFontSize }]}>Profile</Text>
               </Pressable>
-              <View style={styles.heroText}>
-                <Text style={styles.title}>Spark Future Leader Academy</Text>
-                <Text style={styles.subtitle}>Your Defence Career Guide</Text>
+
+              <View style={styles.heroRow}>
+                <View style={[styles.heroText, { paddingRight: badgeReserve }]}>
+                  <Text style={[styles.title, { fontSize: titleFontSize, lineHeight: titleLineHeight }]}>
+                    P Obul Reddy Public School & Spark Future Leaders Academy
+                  </Text>
+                  <Text
+                    style={[
+                      styles.subtitle,
+                      {
+                        marginTop: titleToSubtitle,
+                        fontSize: subtitleFontSize,
+                        lineHeight: subtitleLineHeight,
+                      },
+                    ]}
+                  >
+                    Your Defence Career Guide
+                  </Text>
+                </View>
               </View>
             </LinearGradient>
           </Animated.View>
         </View>
 
-        <View style={[styles.grid, { gap }]}>
+        <View style={[styles.grid, { height: layout.gridH, marginTop: heroToGridGap, columnGap: colGap, rowGap: layout.rowGap }]}>
           <Animated.View style={enterStyle(0)}>
             <DashboardCard
               style={{ width: cardWidth }}
+              height={layout.rowH}
               accent={colors.accentOrange}
               icon="medal-outline"
               title="Defence Careers"
@@ -146,6 +251,7 @@ export default function HomeScreen({ navigation }) {
           <Animated.View style={enterStyle(1)}>
             <DashboardCard
               style={{ width: cardWidth }}
+              height={layout.rowH}
               accent={colors.accentBlue}
               icon="chatbubble-ellipses-outline"
               title="Career Guide"
@@ -158,6 +264,7 @@ export default function HomeScreen({ navigation }) {
           <Animated.View style={enterStyle(2)}>
             <DashboardCard
               style={{ width: cardWidth }}
+              height={layout.rowH}
               accent={colors.accentGreen}
               icon="rocket-outline"
               title="Entry Schemes"
@@ -169,6 +276,7 @@ export default function HomeScreen({ navigation }) {
           <Animated.View style={enterStyle(3)}>
             <DashboardCard
               style={{ width: cardWidth }}
+              height={layout.rowH}
               accent={colors.accentPurple}
               icon="school-outline"
               title="Preparation"
@@ -180,6 +288,7 @@ export default function HomeScreen({ navigation }) {
           <Animated.View style={enterStyle(4)}>
             <DashboardCard
               style={{ width: cardWidth }}
+              height={layout.rowH}
               accent={colors.accentGreen}
               icon="fitness-outline"
               title="Fitness & Medical"
@@ -191,6 +300,7 @@ export default function HomeScreen({ navigation }) {
           <Animated.View style={enterStyle(5)}>
             <DashboardCard
               style={{ width: cardWidth }}
+              height={layout.rowH}
               accent={colors.accentBlue}
               icon="notifications-outline"
               title="Alerts & Updates"
@@ -200,25 +310,22 @@ export default function HomeScreen({ navigation }) {
             />
           </Animated.View>
         </View>
-
-      </ScrollView>
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { paddingBottom: 0 },
-  top: { paddingTop: 10, paddingBottom: 16 },
+  container: { flex: 1 },
+  heroWrap: { justifyContent: 'flex-start' },
   heroBgGlow: {
     position: 'absolute',
-    left: 18,
-    right: 18,
-    top: 10,
-    borderRadius: 26,
+    left: 0,
+    right: 0,
+    top: 0,
     overflow: 'hidden',
   },
   hero: {
-    borderRadius: 22,
     borderWidth: 1,
     borderColor: colors.glassBorder,
     backgroundColor: colors.glass2,
@@ -228,22 +335,34 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 14 },
     elevation: 12,
   },
-  title: { color: colors.text, fontSize: 26, fontWeight: '900', letterSpacing: 0.25, marginTop: 6 },
-  subtitle: { marginTop: 6, color: colors.muted, fontSize: 13.5, lineHeight: 18, fontWeight: '600' },
-  heroText: { paddingRight: 84 },
+  heroRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  heroText: { flex: 1, minWidth: 0 },
+  title: {
+    color: colors.text,
+    fontWeight: '900',
+    letterSpacing: 0.25,
+    marginTop: 6,
+    flexShrink: 1,
+    includeFontPadding: false,
+  },
+  subtitle: {
+    color: colors.muted,
+    fontWeight: '600',
+    flexShrink: 1,
+    includeFontPadding: Platform.OS === 'android',
+    paddingBottom: Platform.OS === 'android' ? 1 : 0,
+  },
   pulse: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
     borderWidth: 1,
     borderColor: 'rgba(45,255,149,0.26)',
     backgroundColor: 'rgba(45,255,149,0.10)',
-    position: 'relative',
+    position: 'absolute',
+    zIndex: 3,
   },
-  pulseInHero: { position: 'absolute', top: 12, right: 12 },
   pulseGlow: {
     position: 'absolute',
     left: -10,
@@ -255,8 +374,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(43,255,155,0.22)',
   },
-  pulseText: { color: colors.text, fontWeight: '800', fontSize: 12 },
+  pulseText: { color: colors.text, fontWeight: '800', fontSize: 12, includeFontPadding: false },
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
 });
-
-

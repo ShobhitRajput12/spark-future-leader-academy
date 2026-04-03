@@ -21,7 +21,7 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <Ionicons name="person" size={22} color={colors.text} />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, minWidth: 0 }}>
             <Text style={styles.name}>Cadet</Text>
             <Text style={styles.desc}>Build your plan • Track your progress</Text>
           </View>
@@ -92,9 +92,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  name: { color: colors.text, fontSize: 18, fontWeight: '900' },
-  desc: { marginTop: 6, color: colors.muted, fontWeight: '700', fontSize: 12.5 },
+  name: { color: colors.text, fontSize: 18, fontWeight: '900', includeFontPadding: false },
+  desc: { marginTop: 6, color: colors.muted, fontWeight: '700', fontSize: 12.5, includeFontPadding: false },
   list: { gap: 12 },
   settingRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  settingText: { color: colors.muted, fontWeight: '700', fontSize: 12.5 },
+  settingText: { color: colors.muted, fontWeight: '700', fontSize: 12.5, includeFontPadding: false },
 });

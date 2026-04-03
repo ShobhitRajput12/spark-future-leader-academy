@@ -95,11 +95,10 @@ export default function AiChatScreen({ route, navigation }) {
             <Ionicons name="arrow-back" size={20} color={colors.text} />
           </Pressable>
           <View style={styles.headerLeft}>
-            <View style={styles.aiIcon}>
-              <Ionicons name="sparkles" size={18} color={colors.accentBlue} />
-            </View>
-            <View>
-              <Text style={styles.headerTitle}>P Obul Reddy Public School & Spark Future Leaders Academy</Text>
+            <View style={styles.headerTitleWrap}>
+              <Text numberOfLines={2} style={styles.headerTitle}>
+                P Obul Reddy Public School & Spark Future Leaders Academy
+              </Text>
             </View>
           </View>
         </View>
@@ -231,7 +230,8 @@ const styles = StyleSheet.create({
   },
   headerMain: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
   backBtn: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 },
+  headerTitleWrap: { flex: 1, minWidth: 0 },
   aiIcon: {
     height: 38,
     width: 38,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(79,211,255,0.26)',
     backgroundColor: 'rgba(79,211,255,0.10)',
   },
-  headerTitle: { color: colors.text, fontWeight: '900', fontSize: 16 },
+  headerTitle: { color: colors.text, fontWeight: '900', fontSize: 16, includeFontPadding: false },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   statusDot: { height: 7, width: 7, borderRadius: 999, backgroundColor: colors.accentGreen },
   statusText: { color: colors.muted, fontWeight: '700', fontSize: 12 },

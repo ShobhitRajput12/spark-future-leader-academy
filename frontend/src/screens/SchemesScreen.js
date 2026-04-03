@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.glass2,
   },
   backBtn: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
-  navTitle: { color: colors.text, fontSize: 22, fontWeight: '900', flexShrink: 1 },
+  navTitle: { color: colors.text, fontSize: 22, fontWeight: '900', flex: 1, minWidth: 0, includeFontPadding: false },
   top: {
     marginTop: 10,
     marginBottom: 10,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   title: { color: colors.text, fontSize: 24, fontWeight: '900', letterSpacing: 0.25 },
-  subtitle: { marginTop: 6, color: colors.muted, fontSize: 13.5, fontWeight: '700' },
+  subtitle: { marginTop: 6, color: colors.muted, fontSize: 13.5, fontWeight: '700', includeFontPadding: false },
   list: { gap: 12 },
   note: {
     marginTop: 10,
@@ -186,6 +186,6 @@ const styles = StyleSheet.create({
     borderColor: colors.glassBorder,
     backgroundColor: colors.glass,
   },
-  noteText: { flex: 1, color: colors.muted, fontWeight: '600', fontSize: 12.5, lineHeight: 17 },
+  noteText: { flex: 1, color: colors.muted, fontWeight: '600', fontSize: 12.5, lineHeight: 17, includeFontPadding: false },
   pressed: { opacity: 0.92 },
 });

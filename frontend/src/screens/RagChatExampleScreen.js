@@ -113,7 +113,7 @@ export default function RagChatExampleScreen() {
           <View style={styles.aiIcon}>
             <Ionicons name="layers-outline" size={18} color={colors.accentBlue} />
           </View>
-          <View>
+          <View style={styles.headerTitleWrap}>
             <Text style={styles.headerTitle}>RAG Assistant</Text>
             <Text style={styles.headerSub}>{uploadStatus}</Text>
             <Text style={styles.headerSub}>API: {baseUrl}</Text>
@@ -251,7 +251,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.glassBorder,
     backgroundColor: colors.glass2,
   },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 },
+  headerTitleWrap: { flex: 1, minWidth: 0 },
   aiIcon: {
     height: 38,
     width: 38,
@@ -262,8 +263,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(79,211,255,0.26)',
     backgroundColor: 'rgba(79,211,255,0.10)',
   },
-  headerTitle: { color: colors.text, fontWeight: '900', fontSize: 16 },
-  headerSub: { color: colors.muted, fontWeight: '700', fontSize: 12, marginTop: 3 },
+  headerTitle: { color: colors.text, fontWeight: '900', fontSize: 16, includeFontPadding: false },
+  headerSub: { color: colors.muted, fontWeight: '700', fontSize: 12, marginTop: 3, includeFontPadding: false },
 
   toolsRow: {
     paddingHorizontal: 18,
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 10,
   },
-  uploadBtnText: { color: colors.text, fontWeight: '900' },
+  uploadBtnText: { color: colors.text, fontWeight: '900', includeFontPadding: false },
 
   list: { paddingHorizontal: 18, paddingBottom: 10 },
   bubble: { maxWidth: '92%', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 16, marginVertical: 6, borderWidth: 1 },

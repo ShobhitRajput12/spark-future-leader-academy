@@ -50,9 +50,9 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 },
-  texts: { flex: 1 },
-  title: { color: colors.text, fontWeight: '900', fontSize: 15, letterSpacing: 0.25 },
-  subtitle: { marginTop: 5, color: colors.muted, fontWeight: '700', fontSize: 12.5, lineHeight: 17 },
+  texts: { flex: 1, minWidth: 0 },
+  title: { color: colors.text, fontWeight: '900', fontSize: 15, letterSpacing: 0.25, includeFontPadding: false },
+  subtitle: { marginTop: 5, color: colors.muted, fontWeight: '700', fontSize: 12.5, lineHeight: 17, includeFontPadding: false },
   right: { alignItems: 'flex-end', justifyContent: 'center' },
   body: { marginTop: 12 },
 });

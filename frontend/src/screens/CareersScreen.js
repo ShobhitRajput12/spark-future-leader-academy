@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     elevation: 12,
   },
-  title: { color: colors.text, fontSize: 24, fontWeight: '900', letterSpacing: 0.25 },
-  subtitle: { marginTop: 6, color: colors.muted, fontSize: 13.5, fontWeight: '700' },
+  title: { color: colors.text, fontSize: 24, fontWeight: '900', letterSpacing: 0.25, includeFontPadding: false },
+  subtitle: { marginTop: 6, color: colors.muted, fontSize: 13.5, fontWeight: '700', includeFontPadding: false },
   list: { gap: 12 },
 });
