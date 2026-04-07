@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Image, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -12,6 +12,13 @@ export default function HomeScreen({ navigation }) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+  const isDesktop = width >= 1200;
+  const isLandscapeTablet = width >= 901 && width < 1200;
+  const isStackedHeader = width < 901;
+  const isSmallPhone = width <= 480;
+  const isTinyPhone = width < 400;
+
+  const logoSize = isDesktop ? 96 : isLandscapeTablet ? 80 : isTinyPhone ? 56 : isSmallPhone ? 60 : 64;
 
   const badgeRefW = useRef(0);
   const [badgeW, setBadgeW] = useState(0);
@@ -71,7 +78,12 @@ export default function HomeScreen({ navigation }) {
   }, [availableHeight, heroToGridGap, rowGapBase, uiScale]);
 
   const heroPadH = useMemo(() => clamp(outerPadding + Math.round(8 * uiScale), outerPadding, outerPadding + 16), [outerPadding, uiScale]);
-  const heroPaddingV = useMemo(() => clamp(Math.round(layout.heroH * 0.12), 6, 22), [layout.heroH]);
+  const heroPaddingV = useMemo(() => {
+    if (isDesktop) return clamp(Math.round(layout.heroH * 0.12), 6, 22);
+    const mult = isTinyPhone ? 0.088 : isSmallPhone ? 0.094 : 0.10;
+    const max = isTinyPhone ? 15 : isSmallPhone ? 16 : 18;
+    return clamp(Math.round(layout.heroH * mult), 6, max);
+  }, [isDesktop, isSmallPhone, isTinyPhone, layout.heroH]);
 
   const heroRadius = useMemo(() => clamp(Math.round(28 * uiScale), 22, 38), [uiScale]);
   const heroGlowRadius = useMemo(() => clamp(heroRadius + 4, 24, 44), [heroRadius]);
@@ -81,22 +93,34 @@ export default function HomeScreen({ navigation }) {
   const pulsePadH = useMemo(() => clamp(Math.round(10 * uiScale), 7, 12), [uiScale]);
   const pulsePadV = useMemo(() => clamp(Math.round(6 * uiScale), 4, 8), [uiScale]);
   const badgeTop = useMemo(() => clamp(Math.round(12 * uiScale), 8, 16), [uiScale]);
-  const badgeRight = useMemo(() => clamp(Math.round(12 * uiScale), 8, 16), [uiScale]);
-  const badgeReserve = useMemo(() => clamp(badgeW + badgeRight + 8, 86, 150), [badgeRight, badgeW]);
 
   const titleFontSize = useMemo(() => {
     const heroTextScale = clamp(layout.heroH / 210, 0.70, 1.08);
     const base = 27 * Math.min(uiScale, heroTextScale);
     const widthAdj = width <= 360 ? -3 : width <= 400 ? -1 : 0;
+    const phoneAdj = isTinyPhone ? -3 : isSmallPhone ? -2 : 0;
+    const tabletAdj = isLandscapeTablet ? 0 : 0;
     const badgeAdj = badgeW >= 96 ? -2 : 0;
-    const approxTextW = width - outerPadding * 2 - heroPadH * 2 - badgeReserve;
+    const approxTextW = width - outerPadding * 2 - heroPadH * 2 - badgeW - logoSize - 12;
     const wAdj2 = approxTextW < 230 ? -2 : approxTextW < 255 ? -1 : 0;
-    return clamp(Math.round(base + widthAdj + badgeAdj + wAdj2), 15, 30);
-  }, [badgeReserve, badgeW, heroPadH, layout.heroH, outerPadding, uiScale, width]);
-  const titleLineHeight = useMemo(() => clamp(Math.round(titleFontSize * 1.16), 20, 34), [titleFontSize]);
-  const titleToSubtitle = useMemo(() => clamp(Math.round(8 * uiScale), 5, 12), [uiScale]);
-  const subtitleFontSize = useMemo(() => clamp(Math.round(13 * uiScale), 11, 15), [uiScale]);
-  const subtitleLineHeight = useMemo(() => clamp(Math.round(18 * uiScale), 14, 20), [uiScale]);
+    const max = isDesktop ? 30 : isLandscapeTablet ? 29 : isSmallPhone ? 26 : 28;
+    return clamp(Math.round(base + widthAdj + phoneAdj + tabletAdj + badgeAdj + wAdj2), 15, max);
+  }, [badgeW, heroPadH, isDesktop, isLandscapeTablet, isSmallPhone, isTinyPhone, layout.heroH, logoSize, outerPadding, uiScale, width]);
+  const titleLineHeight = useMemo(() => {
+    if (isDesktop) return clamp(Math.round(titleFontSize * 1.16), 20, 34);
+    const mult = isTinyPhone ? 1.04 : isSmallPhone ? 1.06 : 1.08;
+    return clamp(Math.round(titleFontSize * mult), 18, 32);
+  }, [isDesktop, isSmallPhone, isTinyPhone, titleFontSize]);
+  const titleToSubtitle = useMemo(() => {
+    if (isDesktop) return clamp(Math.round(8 * uiScale), 5, 12);
+    const base = isTinyPhone ? 4 : isSmallPhone ? 5 : 6;
+    return clamp(Math.round(base * uiScale), 4, 12);
+  }, [isDesktop, isSmallPhone, isTinyPhone, uiScale]);
+  const subtitleFontSize = useMemo(() => {
+    const adj = isTinyPhone ? -2 : isSmallPhone ? -1 : 0;
+    return clamp(Math.round(13 * uiScale + adj), 10, 15);
+  }, [isSmallPhone, isTinyPhone, uiScale]);
+  const subtitleLineHeight = useMemo(() => clamp(Math.round(subtitleFontSize * 1.35), 13, 20), [subtitleFontSize]);
 
   const heroFade = useRef(new Animated.Value(0)).current;
   const heroLift = useRef(new Animated.Value(10)).current;
@@ -194,43 +218,105 @@ export default function HomeScreen({ navigation }) {
                 },
               ]}
             >
-              <Pressable
-                onPress={() => navigation.getParent()?.navigate('Profile')}
-                onLayout={(e) => {
-                  const w = Math.round(e?.nativeEvent?.layout?.width || 0);
-                  if (!w || w === badgeRefW.current) return;
-                  badgeRefW.current = w;
-                  setBadgeW(w);
-                }}
-                style={[
-                  styles.pulse,
-                  { paddingHorizontal: pulsePadH, paddingVertical: pulsePadV, top: badgeTop, right: badgeRight },
-                ]}
-              >
-                <Animated.View pointerEvents="none" style={[styles.pulseGlow, { opacity: pulseOpacity, transform: [{ scale: pulseScale }] }]} />
-                <Ionicons name="person-circle" size={16} color={colors.accentGreen} />
-                <Text style={[styles.pulseText, { fontSize: pulseFontSize }]}>Profile</Text>
-              </Pressable>
+              {!isStackedHeader ? (
+                <View style={styles.heroRow}>
+                  <View style={styles.brandLeft}>
+                    <View style={[styles.brandLogoWrap, { width: logoSize, height: logoSize }]}>
+                      <Image
+                        source={{
+                          uri: 'https://res.cloudinary.com/dytoubgbw/image/upload/v1775549605/logo_qiajma.jpg',
+                        }}
+                        style={styles.brandLogoImg}
+                      />
+                    </View>
+                    <View style={styles.brandText}>
+                      <Text style={[styles.title, { fontSize: titleFontSize, lineHeight: titleLineHeight }]}>
+                        P Obul Reddy Public School & Spark Future Leaders Academy
+                      </Text>
+                      <Text
+                        style={[
+                          styles.subtitle,
+                          {
+                            marginTop: titleToSubtitle,
+                            fontSize: subtitleFontSize,
+                            lineHeight: subtitleLineHeight,
+                          },
+                        ]}
+                      >
+                        Your Defence Career Guide
+                      </Text>
+                    </View>
+                  </View>
 
-              <View style={styles.heroRow}>
-                <View style={[styles.heroText, { paddingRight: badgeReserve }]}>
-                  <Text style={[styles.title, { fontSize: titleFontSize, lineHeight: titleLineHeight }]}>
-                    P Obul Reddy Public School & Spark Future Leaders Academy
-                  </Text>
-                  <Text
-                    style={[
-                      styles.subtitle,
-                      {
-                        marginTop: titleToSubtitle,
-                        fontSize: subtitleFontSize,
-                        lineHeight: subtitleLineHeight,
-                      },
-                    ]}
+                  <Pressable
+                    onPress={() => navigation.getParent()?.navigate('Profile')}
+                    onLayout={(e) => {
+                      const w = Math.round(e?.nativeEvent?.layout?.width || 0);
+                      if (!w || w === badgeRefW.current) return;
+                      badgeRefW.current = w;
+                      setBadgeW(w);
+                    }}
+                    style={[styles.pulse, { paddingHorizontal: pulsePadH, paddingVertical: pulsePadV, marginTop: badgeTop }]}
                   >
-                    Your Defence Career Guide
-                  </Text>
+                    <Animated.View pointerEvents="none" style={[styles.pulseGlow, { opacity: pulseOpacity, transform: [{ scale: pulseScale }] }]} />
+                    <Ionicons name="person-circle" size={16} color={colors.accentGreen} />
+                    <Text style={[styles.pulseText, { fontSize: pulseFontSize }]}>Profile</Text>
+                  </Pressable>
                 </View>
-              </View>
+              ) : (
+                <View style={styles.heroMobileWrap}>
+                  <View style={styles.heroMobileTopRow}>
+                    <View style={[styles.brandLogoWrap, { width: logoSize, height: logoSize }]}>
+                      <Image
+                        source={{
+                          uri: 'https://res.cloudinary.com/dytoubgbw/image/upload/v1775549605/logo_qiajma.jpg',
+                        }}
+                        style={styles.brandLogoImg}
+                      />
+                    </View>
+
+                    <Pressable
+                      onPress={() => navigation.getParent()?.navigate('Profile')}
+                      onLayout={(e) => {
+                        const w = Math.round(e?.nativeEvent?.layout?.width || 0);
+                        if (!w || w === badgeRefW.current) return;
+                        badgeRefW.current = w;
+                        setBadgeW(w);
+                      }}
+                      style={[styles.pulse, { paddingHorizontal: pulsePadH, paddingVertical: pulsePadV }]}
+                    >
+                      <Animated.View pointerEvents="none" style={[styles.pulseGlow, { opacity: pulseOpacity, transform: [{ scale: pulseScale }] }]} />
+                      <Ionicons name="person-circle" size={16} color={colors.accentGreen} />
+                      <Text style={[styles.pulseText, { fontSize: pulseFontSize }]}>Profile</Text>
+                    </Pressable>
+                  </View>
+
+                  <View style={styles.heroMobileText}>
+                    <Text
+                      style={[
+                        styles.title,
+                        styles.titleMobile,
+                        isTinyPhone ? styles.titleSmallPhone : null,
+                        { fontSize: titleFontSize, lineHeight: titleLineHeight },
+                      ]}
+                    >
+                      P Obul Reddy Public School & Spark Future Leaders Academy
+                    </Text>
+                    <Text
+                      style={[
+                        styles.subtitle,
+                        {
+                          marginTop: titleToSubtitle,
+                          fontSize: subtitleFontSize,
+                          lineHeight: subtitleLineHeight,
+                        },
+                      ]}
+                    >
+                      Your Defence Career Guide
+                    </Text>
+                  </View>
+                </View>
+              )}
             </LinearGradient>
           </Animated.View>
         </View>
@@ -335,8 +421,28 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 14 },
     elevation: 12,
   },
-  heroRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  heroText: { flex: 1, minWidth: 0 },
+  heroRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  heroMobileWrap: { flexDirection: 'column', width: '100%' },
+  heroMobileTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  heroMobileText: { width: '100%', minWidth: 0, flexShrink: 1 },
+  brandLeft: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  brandText: { flex: 1, minWidth: 0 },
+  brandLogoWrap: {
+    borderRadius: 999,
+    backgroundColor: '#fff',
+    padding: 6,
+    flexShrink: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.55)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
+  brandLogoImg: { width: '100%', height: '100%', borderRadius: 999, resizeMode: 'contain' },
   title: {
     color: colors.text,
     fontWeight: '900',
@@ -345,6 +451,11 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     includeFontPadding: false,
   },
+  titleMobile: {
+    width: '100%',
+    flexWrap: 'wrap',
+  },
+  titleSmallPhone: { marginTop: 2 },
   subtitle: {
     color: colors.muted,
     fontWeight: '600',
@@ -360,8 +471,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(45,255,149,0.26)',
     backgroundColor: 'rgba(45,255,149,0.10)',
-    position: 'absolute',
-    zIndex: 3,
   },
   pulseGlow: {
     position: 'absolute',
